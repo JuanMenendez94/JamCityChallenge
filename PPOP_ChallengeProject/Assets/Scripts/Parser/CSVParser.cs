@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-//This class will parse CSV containing int values only. Can be updated to manage strings.
+//This class will parse CSV files containing int values in string format. Can be updated to handle strings too.
 public static class CSVParser
 {
    private static char _fieldSeparator = ',';
@@ -26,6 +26,7 @@ public static class CSVParser
                 bool didParse = int.TryParse(columnElements[j], out parsedItem);
                 if(didParse)
                 {
+                    //creating the parsed grid
                     parsedData[i, j] = parsedItem;
                 }
                 else

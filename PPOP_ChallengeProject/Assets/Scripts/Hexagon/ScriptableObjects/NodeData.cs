@@ -7,6 +7,6 @@ public class NodeData : ScriptableObject
 {
     public NodeSharedData.Type type;
     public bool isWalkable;
-    public int cost;
+    public float cost;
     public Texture albedo;
 }

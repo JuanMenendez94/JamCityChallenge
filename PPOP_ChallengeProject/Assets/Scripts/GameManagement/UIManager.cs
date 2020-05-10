@@ -15,6 +15,7 @@ public class UIManager : MonoBehaviour
         if(_instance == null)
         {
             _instance = this;
+            //we hash the trigger name for better performance. It's faster to read an int over a string.
             hashedWarningTrigger = Animator.StringToHash(warningTrigger);
         }
     }
@@ -27,13 +28,19 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    /*Resets Game instance*/
     public void OnReset()
     {
         GameManager.Instance.ResetPathing();
     }
 
+    /*Shows non walkable node message*/
     public void TriggerNonWalkableWarning()
     {
-        warningTextAnimator.SetTrigger(hashedWarningTrigger);
+        if(warningTextAnimator!= null)
+        {
+            warningTextAnimator.SetTrigger(hashedWarningTrigger);
+        }
+       
     }
 }

@@ -23,7 +23,16 @@ public class Node : MonoBehaviour, IConfigurableAstarNode , IClickable , IObserv
 
     public float CostTo(IAStarNode neighbour)
     {
-        return _cost;
+        IConfigurableAstarNode node = (IConfigurableAstarNode)neighbour;
+        if (node != null)
+        {
+            return node.Cost;
+        }
+        else
+        {
+            throw new System.Exception("Can't cast IAstarNode");
+        }
+
     }
 
     public float EstimatedCostTo(IAStarNode target)
@@ -35,7 +44,10 @@ public class Node : MonoBehaviour, IConfigurableAstarNode , IClickable , IObserv
             Vector2 destination = new Vector2(node.Transform.position.x, node.Transform.position.z); ;
             return Utility.PythagoreanDistance(origin, destination);
         }
-        return 0;
+        else
+        {
+            throw new System.Exception("Can't cast IAstarNode");
+        }
     }
 
     public void Initialize()
@@ -43,6 +55,7 @@ public class Node : MonoBehaviour, IConfigurableAstarNode , IClickable , IObserv
         _clickCallbacks = new List<Action<IObservable>>();
         _neighbours = new List<IAStarNode>();
     }
+
     //we will set the data from the scriptable objects to the node here.
     public void Configure(NodeData data,Vector2 coordinates)
     {
@@ -58,6 +71,7 @@ public class Node : MonoBehaviour, IConfigurableAstarNode , IClickable , IObserv
         }
     }
 
+    /*Properties*/
     public bool isWalkable
     {
         get
@@ -66,6 +80,13 @@ public class Node : MonoBehaviour, IConfigurableAstarNode , IClickable , IObserv
         }
     }
 
+    public float Cost
+    {
+        get
+        {
+            return _cost;
+        }
+    }
     public Vector2 Coordinates
     {
         get
@@ -88,7 +109,7 @@ public class Node : MonoBehaviour, IConfigurableAstarNode , IClickable , IObserv
         }
     }
 
-    //Behavior to trigger when this tile is clicked.
+    //Behaviors to trigger when this tile is clicked.
     public List<Action<IObservable>> ObservedCallbacks
     {
         get
@@ -96,7 +117,7 @@ public class Node : MonoBehaviour, IConfigurableAstarNode , IClickable , IObserv
             return _clickCallbacks;
         }
     }
-
+    /*------------------------------------------------------*/
     public void AddNeighbour(IConfigurableAstarNode n)
     {
         _neighbours.Add(n);
@@ -124,12 +145,12 @@ public class Node : MonoBehaviour, IConfigurableAstarNode , IClickable , IObserv
     //Uncomment for connections debugging
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
+        /*Gizmos.color = Color.red;
 
         foreach(var n in _neighbours)
         {
             var a  = (IConfigurableAstarNode)n;
             Gizmos.DrawLine(transform.position + Vector3.up *0.5f,a.Transform.position + Vector3.up*0.5f);
-        }
+        }*/
     }
 }

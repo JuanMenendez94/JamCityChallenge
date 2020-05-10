@@ -49,6 +49,7 @@ public class NodeSharedData: MonoBehaviour
         }
     }
 
+    /*returns a tile color based on id*/
     public Color GetColor(TintColor color)
     {
         if(!_colorTable.ContainsKey(color))

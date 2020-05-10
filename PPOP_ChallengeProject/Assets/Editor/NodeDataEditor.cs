@@ -16,7 +16,7 @@ public class NodeDataEditor : Editor
 
         if (_target.isWalkable)
         {
-            _target.cost = EditorGUILayout.IntField("Cost",_target.cost);
+            _target.cost = EditorGUILayout.FloatField("Cost",_target.cost);
         }
     }
 }

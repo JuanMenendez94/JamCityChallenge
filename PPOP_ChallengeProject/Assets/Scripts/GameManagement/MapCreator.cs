@@ -5,12 +5,13 @@ using UnityEngine;
 
 public class MapCreator : MonoBehaviour
 {
-    private Collider[] asd;
-
+    //extra behavior to be executed when an instance of this class is destroyed
     private Action _onDestroyCallback = delegate { };
+
     //list of scriptable objects which contain different tiles data
     public List<NodeData> dataPrefabs;
 
+    //cached nodeData scriptable objects
     private Dictionary<NodeSharedData.Type, NodeData> _dataTable;
 
     //amount of rows and columns to display
@@ -21,9 +22,13 @@ public class MapCreator : MonoBehaviour
     public float tileRowOffset;
     public float tileColumnOffset;
 
-    public GameObject nodePrefab;//base hexagon prefab to load
-    public string CsvDataPath; //spreadsheet to determine which tile to load on each position
+    //base hexagon prefab to load
+    public GameObject nodePrefab;
 
+    //spreadsheet in CSV fromat to determine which tile to load on each position
+    public string CsvDataPath;
+
+    //int grid which will be cast to NodeSharedData.Type enum to access the data for each element
     private int[,] parsedMapValues;
 
     public void Initialize()
@@ -34,7 +39,7 @@ public class MapCreator : MonoBehaviour
 
     private void InitializeDataTable()
     {
-        _dataTable = new Dictionary<NodeSharedData.Type, NodeData>(); //cached tiles data. Todo : create a class that can provide this info
+        _dataTable = new Dictionary<NodeSharedData.Type, NodeData>();
 
         foreach (var data in dataPrefabs)
         {
@@ -63,14 +68,22 @@ public class MapCreator : MonoBehaviour
                 /*tile position and color configuration*/
                 IConfigurableAstarNode ConfigurableComponent = element.GetComponent<IConfigurableAstarNode>();
                 ConfigurableComponent.Initialize();
+
+                //we displace the even rows a bit to match the hexagonal grid format
                 float columnOffset = i % 2 == 0 ? tileColumnOffset * 0.5f : tileColumnOffset;
 
                 Vector3 offsetDistance = new Vector3(i * tileRowOffset, 0, j * tileColumnOffset + columnOffset);
+
+                //setting instantiated objects names for debugging purposes. Not necessary for implementation
                 ConfigurableComponent.Transform.name = "(" + i + ")" + " " + "(" + j + ")";
+
+                //setting element position
                 ConfigurableComponent.Transform.position = transform.position + offsetDistance;
+
+                //setting the data to the element
                 ConfigurableComponent.Configure(_dataTable[(NodeSharedData.Type)parsedMapValues[i, j]], new Vector2(i, j));
 
-                /*setting tile interaction callbacks*/
+                //setting tile interaction callbacks
                 IObservable observableComponent = ConfigurableComponent.Transform.GetComponent<IObservable>();
                 if(observableComponent != null)
                 {
@@ -81,7 +94,7 @@ public class MapCreator : MonoBehaviour
                 //adding the element to the map
                 map[i, j] = ConfigurableComponent;
   
-                //making connection with previous nodes
+                //making connections with previous nodes
                 ConnectNodes(map, i, j);
             }
         }
@@ -94,7 +107,7 @@ public class MapCreator : MonoBehaviour
     {
         var current = map[row,column];
 
-        /*the following block of code checks bounds with previous created nodes and make a 2 way connection*/
+        /*the following block of code checks bounds with previously created nodes and make a 2 way connection*/
         if (column - 1 >= 0)
         {
             var topConnection = map[row, column - 1];
@@ -128,6 +141,7 @@ public class MapCreator : MonoBehaviour
         }
     }
 
+    /*Properties*/
     public Action OnDestroyCallback
     {
         set
@@ -135,6 +149,7 @@ public class MapCreator : MonoBehaviour
             _onDestroyCallback = value;
         }
     }
+    /*---------------------------------------*/
 
     private void OnDestroy()
     {

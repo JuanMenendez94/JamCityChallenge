@@ -42,15 +42,18 @@ public class GameManager : MonoBehaviour
 
     private void NotifyClickedTile(IObservable node)
     {
+        if (_startNode != null && _endNode != null) return;
+
         var configurableNode = (IConfigurableAstarNode)node;
         if(!configurableNode.isWalkable)
         {
             UIManager.Instance.TriggerNonWalkableWarning();
-            return; // we return because we mustn't process water nodes.
+            return; // we return because we mustn't process non walkable nodes (water in this case).
         }
         if(_startNode == null)
         {
             _startNode = configurableNode;
+            TintNode(_startNode, NodeSharedData.Instance.GetColor(NodeSharedData.TintColor.EXTREMES));
         }
         else if(_endNode == null && node != _startNode)
         {
@@ -71,17 +74,9 @@ public class GameManager : MonoBehaviour
             }
             else
             {
+                TintNode(_endNode, NodeSharedData.Instance.GetColor(NodeSharedData.TintColor.EXTREMES));
                 print("no path found");
             }
-        }
-        if(_path == null)
-        {
-            ITintable tintableComponent = node.Transform.GetComponent<ITintable>();
-            if(tintableComponent != null)
-            {
-                tintableComponent.Tint(NodeSharedData.Instance.GetColor(NodeSharedData.TintColor.EXTREMES));
-            }
-            
         }
         
     }
@@ -140,11 +135,16 @@ public class GameManager : MonoBehaviour
         {
             return;
         }
+        TintNode(node, NodeSharedData.Instance.GetColor(NodeSharedData.TintColor.NO_TINT));
+        
+    }
 
+    private void TintNode(IConfigurableAstarNode node, Color color)
+    {
         ITintable tintComponent = ((Node)node).GetComponent<ITintable>();
         if (tintComponent != null)
         {
-            tintComponent.Tint(NodeSharedData.Instance.GetColor(NodeSharedData.TintColor.NO_TINT));
+            tintComponent.Tint(color);
         }
     }
 }
