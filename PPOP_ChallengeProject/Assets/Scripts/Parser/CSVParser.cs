@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//This class will parse CSV containing int values only. Can be updated to manage strings.
 public static class CSVParser
 {
    private static char _fieldSeparator = ',';

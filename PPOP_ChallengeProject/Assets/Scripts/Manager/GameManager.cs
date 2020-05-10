@@ -1,66 +1,77 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using NodeSharedData;
+using PathFinding;
 using UnityEngine;
 
+[RequireComponent(typeof(MapCreator))]
 public class GameManager : MonoBehaviour
 {
+    public static GameManager _instance;
 
-    public List<NodeData> dataPrefabs;
-
-    private Dictionary<Type, NodeData> _dataTable;
-
-
-    public int rows;
-    public int columns;
-    public float tileRowOffset;
-    public float tileColumnOffset;
-    public GameObject nodePrefab;
-    public string CsvDataPath;
 
     private IConfigurableAstarNode[,] _map;
+    private MapCreator _mapCreator;
 
-    private int[,] parsedMap;
 
+    private IConfigurableAstarNode startNode;
+
+    private IConfigurableAstarNode endNode;
+
+    private IList<IAStarNode> _path;
+
+    private void Awake()
+    {
+        if(_instance == null)
+        {
+            _instance = this;
+        }
+    }
     // Start is called before the first frame update
     void Start()
     {
-        parsedMap = CSVParser.Parse(CsvDataPath, rows,columns);
-
-
-        _dataTable = new Dictionary<Type, NodeData>();
-
-        foreach(var data in dataPrefabs)
-        {
-            if(!_dataTable.ContainsKey(data.type))
-            {
-                _dataTable.Add(data.type, data);
-            }
-        }
-
-        _map = CreateMap();
+        _mapCreator = GetComponent<MapCreator>();
+        Initialize();
     }
 
 
-    //This function creates the map and configures it according to the rows, columns and the loaded CSV file
-    private IConfigurableAstarNode[,] CreateMap()
+    private void Initialize()
     {
-        var tempMap = new IConfigurableAstarNode[rows, columns];
+        _mapCreator.OnDestroyCallback = OnDestroyCallback;
+        _mapCreator.Initialize();
+        _map = _mapCreator.CreateMap(NotifyClickedTile);
+    }
 
-        for (int i = 0; i < tempMap.GetLength(0); i++)
+    private void NotifyClickedTile(IObservable node)
+    {
+        if(startNode == null)
         {
-            for (int j = 0; j < tempMap.GetLength(1); j++)
-            {
-                IConfigurableAstarNode element = Instantiate(nodePrefab).GetComponent<IConfigurableAstarNode>();
-                float columnOffset = i % 2 == 0 ? tileColumnOffset * 0.5f : tileColumnOffset;
-
-                Vector3 offsetDistance = new Vector3(i * tileRowOffset, 0,j * tileColumnOffset + columnOffset);
-                element.Transform.name = "(" + i + ")" + " " + "(" + j + ")"; 
-                element.Transform.position = transform.position + offsetDistance;
-                element.Configure(_dataTable[(Type)parsedMap[i, j]]);
-            }
+            startNode = (IConfigurableAstarNode)node;
         }
+        else if(endNode == null)
+        {
+            endNode = (IConfigurableAstarNode)node;
+            _path = AStar.GetPath(startNode, endNode);
+        }
+        else
+        {
+            return;
+        }
+        node.Tint(NodeSharedData.Instance.GetColor(NodeSharedData.TintColor.EXTREMES));
+    }
 
-        return tempMap;
+    private void OnDestroyCallback()
+    {
+       /* foreach (var item in _map)
+        {
+            item.UnRegisterObserverCallback(NotifyClickedTile);
+        }*/
+    }
+
+    public GameManager Instance
+    {
+        get
+        {
+            return _instance;
+        }
     }
 }
