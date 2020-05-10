@@ -28,6 +28,13 @@ public class Node : MonoBehaviour, IConfigurableAstarNode , IClickable , IObserv
 
     public float EstimatedCostTo(IAStarNode target)
     {
+        IConfigurableAstarNode node = (IConfigurableAstarNode)target;
+        if(node != null)
+        {
+            Vector2 origin = new Vector2(transform.position.x, transform.position.z);
+            Vector2 destination = new Vector2(node.Transform.position.x, node.Transform.position.z); ;
+            return Utility.PythagoreanDistance(origin, destination);
+        }
         return 0;
     }
 
@@ -60,6 +67,13 @@ public class Node : MonoBehaviour, IConfigurableAstarNode , IClickable , IObserv
             return transform;
         }
     }
+    public NodeSharedData.Type Type
+    {
+        get
+        {
+            return _type;
+        }
+    }
 
     public List<Action<IObservable>> ObservedCallbacks
     {
@@ -76,7 +90,6 @@ public class Node : MonoBehaviour, IConfigurableAstarNode , IClickable , IObserv
 
     public void OnClick()
     {
-        if (_type == NodeSharedData.Type.WATER) return;
         foreach(var cb in _clickCallbacks)
         {
             cb(this);

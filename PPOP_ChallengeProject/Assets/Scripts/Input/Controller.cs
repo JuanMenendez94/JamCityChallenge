@@ -6,10 +6,9 @@ using UnityEngine;
 public class Controller : MonoBehaviour
 {
     private Camera _camera;
-    private int tileHitLayerMask = 1 << Constants.Layers.Tile;
+    private int tileHitLayerMask = 1 << Utility.Constants.Layers.Tile;
     public float rayDistance;
 
-    private Ray debugCameraRay; //debug
     private void Start()
     {
         _camera = Camera.main;
@@ -19,7 +18,7 @@ public class Controller : MonoBehaviour
     {
         if(Input.GetMouseButtonDown(0))
         {
-            Ray ray = debugCameraRay = _camera.ScreenPointToRay(Input.mousePosition);
+            Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
             RaycastHit _rh;
             if (Physics.Raycast(ray, out _rh, rayDistance, tileHitLayerMask))
             {
@@ -30,11 +29,5 @@ public class Controller : MonoBehaviour
                 }
             }
         }
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawRay(debugCameraRay);
     }
 }

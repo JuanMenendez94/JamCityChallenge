@@ -6,7 +6,7 @@ using UnityEngine;
 [RequireComponent(typeof(MapCreator))]
 public class GameManager : MonoBehaviour
 {
-    public static GameManager _instance;
+    private static GameManager _instance;
 
 
     private IConfigurableAstarNode[,] _map;
@@ -42,13 +42,19 @@ public class GameManager : MonoBehaviour
 
     private void NotifyClickedTile(IObservable node)
     {
+        var configurableNode = (IConfigurableAstarNode)node;
+        if(configurableNode.Type == NodeSharedData.Type.WATER)
+        {
+            UIManager.Instance.TriggerWaterWarning();
+            return; // we return because we mustn't process water nodes.
+        }
         if(_startNode == null)
         {
-            _startNode = (IConfigurableAstarNode)node;
+            _startNode = configurableNode;
         }
         else if(_endNode == null && node != _startNode)
         {
-            _endNode = (IConfigurableAstarNode)node;
+            _endNode = configurableNode;
             _path = AStar.GetPath(_startNode, _endNode);
             if(_path.Count > 0)
             {
@@ -77,13 +83,16 @@ public class GameManager : MonoBehaviour
 
     private void OnDestroyCallback()
     {
-       /* foreach (var item in _map)
+        foreach (var item in _map)
         {
-            item.UnRegisterObserverCallback(NotifyClickedTile);
-        }*/
+            if(item != null)
+            {
+                item.UnRegisterObserverCallback(NotifyClickedTile);
+            }      
+        }
     }
 
-    public GameManager Instance
+    public static GameManager Instance
     {
         get
         {
@@ -93,14 +102,18 @@ public class GameManager : MonoBehaviour
 
     public void ResetPathing()
     {
-        for (int i = 0; i < _path.Count; i++)
+        if(_path != null)
         {
-            var tintableItem = (ITintable)_path[i];
-            if (tintableItem != null)
-            { 
-                tintableItem.Tint(NodeSharedData.Instance.GetColor(NodeSharedData.TintColor.NO_TINT));
+            for (int i = 0; i < _path.Count; i++)
+            {
+                var tintableItem = (ITintable)_path[i];
+                if (tintableItem != null)
+                {
+                    tintableItem.Tint(NodeSharedData.Instance.GetColor(NodeSharedData.TintColor.NO_TINT));
+                }
             }
         }
+        
         _path = null;
         _startNode = null;
         _endNode = null;

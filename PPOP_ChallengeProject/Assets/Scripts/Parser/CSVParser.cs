@@ -10,17 +10,18 @@ public static class CSVParser
 
     public static int[,] Parse(string path, int rows, int columns)
    {
-        Debug.Log(path);
         TextAsset data = Resources.Load<TextAsset>(path);
         int[,]parsedData = new int[rows,columns];
 
-        string[] rowData = data.text.Split(_lineSeperator);
+        string[] rowData = data.text.Split(_lineSeperator); //splits lines into rows
 
         for (int i = 0; i < rowData.Length; i++)
         {
-            string[] columnElements = rowData[i].Split(_fieldSeparator);
+            string[] columnElements = rowData[i].Split(_fieldSeparator); //splits rows into individual elements
+
             for (int j = 0; j < columnElements.Length; j++)
             {
+                //casting strings to ints.
                 int parsedItem;
                 bool didParse = int.TryParse(columnElements[j], out parsedItem);
                 if(didParse)

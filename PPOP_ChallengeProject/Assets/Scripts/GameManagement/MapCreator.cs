@@ -73,46 +73,52 @@ public class MapCreator : MonoBehaviour
                 /*setting tile interaction callbacks*/
                 ConfigurableComponent.RegisterObserverCallback(OnClickedCallback);
 
-
-                /*the following block of code checks bounds with previous created nodes and make a 2 way connection*/
-                var current = map[i, j] = ConfigurableComponent;
-                
-               if(j-1 >= 0)
-               {
-                    var toConnect = map[i, j - 1];
-                    ConnectNodes(current, toConnect);
-               }
-               if(i-1 >= 0)
-                {
-                    var toConnect = map[i-1, j];
-                    ConnectNodes(current, toConnect);
-
-                   if(j+1 < columns && (i-1) %2 == 0) //we need to check if the previous row is even to make the connections work in this hexagonal map. We can avoid it in a square map
-                    {
-                        var toConnect2 = map[i-1, j+1];
-                        ConnectNodes(current, toConnect2);
-                    }
-
-                   if(j-1 >= 0 && (i-1) % 2 == 1)//we need to check if the previous row is not even to make the connections work in this hexagonal map. We can avoid it in a square map
-                    {
-                        var toConnect3 = map[i - 1, j - 1];
-                        ConnectNodes(current, toConnect3);
-                    }
-                }
+                //adding the element to the map
+                map[i, j] = ConfigurableComponent;
+  
+                //making connection with previous nodes
+                ConnectNodes(map, i, j);
             }
         }
 
         return map;
     }
 
-
     /*Creates a 2 way node connection*/
-    private void ConnectNodes(IConfigurableAstarNode node1, IConfigurableAstarNode node2)
+    private void ConnectNodes(IConfigurableAstarNode[,]map,int row, int column)
+    {
+        var current = map[row,column];
+
+        /*the following block of code checks bounds with previous created nodes and make a 2 way connection*/
+        if (column - 1 >= 0)
+        {
+            var toConnect = map[row, column - 1];
+            ConnectNodesBothWays(current, toConnect);
+        }
+        if (row - 1 >= 0)
+        {
+            var toConnect = map[row - 1, column];
+            ConnectNodesBothWays(current, toConnect);
+
+            if (column + 1 < columns && (row - 1) % 2 == 0) //we need to check if the previous row is even to make the connections work in this hexagonal map. We can avoid it in a square map
+            {
+                var toConnect2 = map[row - 1, column + 1];
+                ConnectNodesBothWays(current, toConnect2);
+            }
+
+            if (column - 1 >= 0 && (row - 1) % 2 == 1)//we need to check if the previous row is not even to make the connections work in this hexagonal map. We can avoid it in a square map
+            {
+                var toConnect3 = map[row - 1, column - 1];
+                ConnectNodesBothWays(current, toConnect3);
+            }
+        }
+    }
+
+    private void ConnectNodesBothWays(IConfigurableAstarNode node1, IConfigurableAstarNode node2)
     {
         node1.AddNeighbour(node2);
         node2.AddNeighbour(node1);
     }
-
 
     public Action OnDestroyCallback
     {
@@ -125,9 +131,5 @@ public class MapCreator : MonoBehaviour
     private void OnDestroy()
     {
         _onDestroyCallback();
-    }
-    private void OnDrawGizmos()
-    {
-
     }
 }
