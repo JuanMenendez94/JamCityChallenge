@@ -6,14 +6,12 @@ using System;
 
 public class Node : MonoBehaviour, IConfigurableAstarNode , IClickable , IObservable
 {
-    private List<IConfigurableAstarNode> _neighbours;
+    private List<IAStarNode> _neighbours;
     private Renderer _renderer;
     private float _cost;
     private List<Action<IObservable>> _clickCallbacks;
     private Vector3 _coordinates;
-
-
-    NodeData Debugdata;
+    private NodeSharedData.Type _type;
 
     public IEnumerable<IAStarNode> Neighbours
     {
@@ -37,14 +35,15 @@ public class Node : MonoBehaviour, IConfigurableAstarNode , IClickable , IObserv
     {
         _renderer = GetComponent<Renderer>();
         _clickCallbacks = new List<Action<IObservable>>();
+        _neighbours = new List<IAStarNode>();
     }
     //we will set the data from the scriptable objects to the node here.
     public void Configure(NodeData data,Vector3 coordinates)
     {
-        Debugdata = data;
         _coordinates = coordinates;
         _renderer.material.SetTexture("_MainTex", data.albedo);
         _cost = data.isWalkable ? data.cost : Mathf.Infinity;
+        _type = data.type;
     }
 
     public Vector3 Coordinates
@@ -62,7 +61,13 @@ public class Node : MonoBehaviour, IConfigurableAstarNode , IClickable , IObserv
         }
     }
 
-    public List<Action> Callbacks => throw new NotImplementedException();
+    public List<Action<IObservable>> ObservedCallbacks
+    {
+        get
+        {
+            return _clickCallbacks;
+        }
+    }
 
     public void AddNeighbour(IConfigurableAstarNode n)
     {
@@ -71,7 +76,7 @@ public class Node : MonoBehaviour, IConfigurableAstarNode , IClickable , IObserv
 
     public void OnClick()
     {
-        Debug.Log("clicked on tile of type " + Debugdata.type);
+        if (_type == NodeSharedData.Type.WATER) return;
         foreach(var cb in _clickCallbacks)
         {
             cb(this);
@@ -91,5 +96,16 @@ public class Node : MonoBehaviour, IConfigurableAstarNode , IClickable , IObserv
     public void Tint(Color color)//tints the tile
     {
         _renderer.material.SetColor("_Color", color);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+
+        foreach(var n in _neighbours)
+        {
+            var a  = (IConfigurableAstarNode)n;
+            Gizmos.DrawLine(transform.position + Vector3.up *0.5f,a.Transform.position + Vector3.up*0.5f);
+        }
     }
 }

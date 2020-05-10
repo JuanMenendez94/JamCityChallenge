@@ -33,7 +33,6 @@ public class GameManager : MonoBehaviour
         Initialize();
     }
 
-
     private void Initialize()
     {
         _mapCreator.OnDestroyCallback = OnDestroyCallback;
@@ -51,6 +50,19 @@ public class GameManager : MonoBehaviour
         {
             endNode = (IConfigurableAstarNode)node;
             _path = AStar.GetPath(startNode, endNode);
+            if(_path.Count > 0)
+            {
+                for (int i = 0; i < _path.Count; i++)
+                {
+                    var tintableItem = (ITintable)_path[i];
+                    if (tintableItem != null)
+                    {
+                        var color = (i == 0 || i == _path.Count - 1) ? NodeSharedData.TintColor.EXTREMES : NodeSharedData.TintColor.ROUTE;
+
+                        tintableItem.Tint(NodeSharedData.Instance.GetColor(color));
+                    }
+                }
+            }
         }
         else
         {
