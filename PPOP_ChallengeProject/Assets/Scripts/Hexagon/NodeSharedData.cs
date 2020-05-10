@@ -22,11 +22,7 @@ public class NodeSharedData: MonoBehaviour
         if(_instance == null)
         {
             _instance = this;
-            _colorTable = new Dictionary<TintColor, Color>();
-
-            _colorTable.Add(TintColor.EXTREMES, _extremeColor);
-            _colorTable.Add(TintColor.ROUTE, _routeColor);
-            _colorTable.Add(TintColor.NO_TINT, _defaultColor);
+            InitializeColorTable();
         }
     }
     public enum Type
@@ -60,5 +56,14 @@ public class NodeSharedData: MonoBehaviour
             throw new System.Exception("Color id non existent");
         }
         return _colorTable[color];
+    }
+
+    private void InitializeColorTable()
+    {
+        _colorTable = new Dictionary<TintColor, Color>();
+
+        _colorTable.Add(TintColor.EXTREMES, _extremeColor);
+        _colorTable.Add(TintColor.ROUTE, _routeColor);
+        _colorTable.Add(TintColor.NO_TINT, _defaultColor);
     }
 }

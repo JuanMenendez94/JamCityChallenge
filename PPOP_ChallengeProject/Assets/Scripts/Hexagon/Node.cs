@@ -7,11 +7,11 @@ using System;
 public class Node : MonoBehaviour, IConfigurableAstarNode , IClickable , IObservable
 {
     private List<IAStarNode> _neighbours;
-    private Renderer _renderer;
     private float _cost;
     private List<Action<IObservable>> _clickCallbacks;
-    private Vector3 _coordinates;
+    private Vector2 _coordinates;
     private NodeSharedData.Type _type;
+    private bool _isWalkable;
 
     public IEnumerable<IAStarNode> Neighbours
     {
@@ -40,20 +40,33 @@ public class Node : MonoBehaviour, IConfigurableAstarNode , IClickable , IObserv
 
     public void Initialize()
     {
-        _renderer = GetComponent<Renderer>();
         _clickCallbacks = new List<Action<IObservable>>();
         _neighbours = new List<IAStarNode>();
     }
     //we will set the data from the scriptable objects to the node here.
-    public void Configure(NodeData data,Vector3 coordinates)
+    public void Configure(NodeData data,Vector2 coordinates)
     {
         _coordinates = coordinates;
-        _renderer.material.SetTexture("_MainTex", data.albedo);
+        _isWalkable = data.isWalkable;
         _cost = data.isWalkable ? data.cost : Mathf.Infinity;
         _type = data.type;
+
+        ITintable tintComponent = GetComponent<ITintable>();
+        if (tintComponent != null)
+        {
+            tintComponent.SetTexture(data.albedo);
+        }
     }
 
-    public Vector3 Coordinates
+    public bool isWalkable
+    {
+        get
+        {
+            return _isWalkable;
+        }
+    }
+
+    public Vector2 Coordinates
     {
         get
         {
@@ -75,6 +88,7 @@ public class Node : MonoBehaviour, IConfigurableAstarNode , IClickable , IObserv
         }
     }
 
+    //Behavior to trigger when this tile is clicked.
     public List<Action<IObservable>> ObservedCallbacks
     {
         get
@@ -88,6 +102,7 @@ public class Node : MonoBehaviour, IConfigurableAstarNode , IClickable , IObserv
         _neighbours.Add(n);
     }
 
+    //triggers click callbacks
     public void OnClick()
     {
         foreach(var cb in _clickCallbacks)
@@ -106,11 +121,7 @@ public class Node : MonoBehaviour, IConfigurableAstarNode , IClickable , IObserv
         _clickCallbacks.Remove(f);
     }
 
-    public void Tint(Color color)//tints the tile
-    {
-        _renderer.material.SetColor("_Color", color);
-    }
-
+    //Uncomment for connections debugging
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;

@@ -1,13 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using PathFinding;
 using UnityEngine;
 
-public interface IConfigurableAstarNode : IObservable
+public interface IConfigurableAstarNode : ITransform
 {
     void AddNeighbour(IConfigurableAstarNode n);
-    void Configure(NodeData data, Vector3 coordinates);
+    void Configure(NodeData data, Vector2 coordinates);
     void Initialize();
+    bool isWalkable { get; }
     NodeSharedData.Type Type {get;}
-    Vector3 Coordinates { get; }
-    Transform Transform { get; }
+    Vector2 Coordinates { get; }
 }

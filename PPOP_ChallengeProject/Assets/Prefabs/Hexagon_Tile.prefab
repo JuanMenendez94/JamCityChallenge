@@ -14,8 +14,9 @@ GameObject:
   - component: {fileID: 4686429736961940599}
   - component: {fileID: 807103817}
   - component: {fileID: 4732316523838983824}
+  - component: {fileID: 5432394108698462848}
   m_Layer: 8
-  m_Name: Hexagon_Model
+  m_Name: Hexagon_Tile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -121,3 +122,15 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 3
+--- !u!114 &5432394108698462848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6288169151276178771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81658c479a54e4f43bfbeb494aa2f57d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

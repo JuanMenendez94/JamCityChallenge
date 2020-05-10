@@ -16,6 +16,7 @@ public class Controller : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //On mouse click search for a tile to select.
         if(Input.GetMouseButtonDown(0))
         {
             Ray ray = _camera.ScreenPointToRay(Input.mousePosition);

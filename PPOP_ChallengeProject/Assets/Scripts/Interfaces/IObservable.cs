@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using PathFinding;
 using System;
 using UnityEngine;
 
-public interface IObservable : ITintable
+public interface IObservable : ITransform
 {
     void RegisterObserverCallback(Action<IObservable> f);
     void UnRegisterObserverCallback(Action<IObservable> f);

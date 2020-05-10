@@ -8,6 +8,12 @@ public static class Utility
         {
             public const int Tile = 8;
         }
+
+        public struct MaterialReferences
+        {
+            public const string MainTexture = "_MainTex";
+            public const string AlbedoColor = "_Color";
+        }
     }
 
 

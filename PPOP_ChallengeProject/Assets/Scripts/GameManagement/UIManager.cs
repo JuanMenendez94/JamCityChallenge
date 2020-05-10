@@ -32,7 +32,7 @@ public class UIManager : MonoBehaviour
         GameManager.Instance.ResetPathing();
     }
 
-    public void TriggerWaterWarning()
+    public void TriggerNonWalkableWarning()
     {
         warningTextAnimator.SetTrigger(hashedWarningTrigger);
     }
