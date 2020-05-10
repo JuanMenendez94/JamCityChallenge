@@ -13,9 +13,9 @@ public class GameManager : MonoBehaviour
     private MapCreator _mapCreator;
 
 
-    private IConfigurableAstarNode startNode;
+    private IConfigurableAstarNode _startNode;
 
-    private IConfigurableAstarNode endNode;
+    private IConfigurableAstarNode _endNode;
 
     private IList<IAStarNode> _path;
 
@@ -42,14 +42,14 @@ public class GameManager : MonoBehaviour
 
     private void NotifyClickedTile(IObservable node)
     {
-        if(startNode == null)
+        if(_startNode == null)
         {
-            startNode = (IConfigurableAstarNode)node;
+            _startNode = (IConfigurableAstarNode)node;
         }
-        else if(endNode == null)
+        else if(_endNode == null && node != _startNode)
         {
-            endNode = (IConfigurableAstarNode)node;
-            _path = AStar.GetPath(startNode, endNode);
+            _endNode = (IConfigurableAstarNode)node;
+            _path = AStar.GetPath(_startNode, _endNode);
             if(_path.Count > 0)
             {
                 for (int i = 0; i < _path.Count; i++)
@@ -63,12 +63,16 @@ public class GameManager : MonoBehaviour
                     }
                 }
             }
+            else
+            {
+                print("no path");
+            }
         }
-        else
+        if(_path == null)
         {
-            return;
+            node.Tint(NodeSharedData.Instance.GetColor(NodeSharedData.TintColor.EXTREMES));
         }
-        node.Tint(NodeSharedData.Instance.GetColor(NodeSharedData.TintColor.EXTREMES));
+        
     }
 
     private void OnDestroyCallback()
@@ -85,5 +89,20 @@ public class GameManager : MonoBehaviour
         {
             return _instance;
         }
+    }
+
+    public void ResetPathing()
+    {
+        for (int i = 0; i < _path.Count; i++)
+        {
+            var tintableItem = (ITintable)_path[i];
+            if (tintableItem != null)
+            { 
+                tintableItem.Tint(NodeSharedData.Instance.GetColor(NodeSharedData.TintColor.NO_TINT));
+            }
+        }
+        _path = null;
+        _startNode = null;
+        _endNode = null;
     }
 }
